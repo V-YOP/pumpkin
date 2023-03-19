@@ -1,0 +1,19 @@
+{
+  "name": "pumpkin",
+  "version": "1.0.0",
+  "description": "A gallery website generator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/V-YOP/pumpkin.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/V-YOP/pumpkin/issues"
+  },
+  "homepage": "https://github.com/V-YOP/pumpkin#readme"
+}
