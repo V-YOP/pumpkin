@@ -1,1 +1,22 @@
+<<<<<<< HEAD
 node_modules
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+node_modules
+=======
+=======
+>>>>>>> 671d18e4bdc63c7010370e56f1b9b945ca479dd1
+node_modules/
+STATIC_ALBUM.json
+dist/
+.DS_Store
+album/
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 671d18e (r)
+=======
+>>>>>>> 671d18e (r)
+=======
+>>>>>>> 671d18e4bdc63c7010370e56f1b9b945ca479dd1
+>>>>>>> c36be30 (提交当前进度)
