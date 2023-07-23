@@ -21,6 +21,11 @@ export type ImageData = {
   height: number
 }
 
+export type AlbumMeta = {
+  albumName: string,
+  images: ImageMeta[],
+}
+
 export type ImageMeta = {
   /**
    * 相册名称
@@ -45,6 +50,11 @@ export type ImageMeta = {
   /**
    * 图像原始高度
    */
-  height: number
+  height: number,
+
+  /**
+   * 图像描述
+   */
+  description?: number,
 }
 

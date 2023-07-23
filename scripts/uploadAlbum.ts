@@ -63,8 +63,7 @@ async function readImage(imgPath: string): Promise<Omit<ImageData, 'original' | 
   const image = Sharp(bf)
   const metadata = await image.metadata()
   const [width, height] = [metadata.width!, metadata.height!]
-  const thumbnailImage = await image.clone().resize(400)
-  const thumbnail = await thumbnailImage.jpeg({quality: 80}).toBuffer()
+  const thumbnail = await image.clone().resize(400).jpeg({quality: 80}).toBuffer()
   return {
     imageName, original: bf, thumbnail, width, height
   }
@@ -91,12 +90,4 @@ async function getAllAlbumImgs() {
   return albumName2imgs
 }
 
-main()
-
-function shuffle<T>(array: T[]): T[] {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
+main();

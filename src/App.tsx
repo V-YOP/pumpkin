@@ -4,30 +4,14 @@ import { Gallery, Item } from 'react-photoswipe-gallery'
 import { Masonry } from "masonic";
 import { useEffect, useMemo, useState } from "react";
 import { ImageMeta } from "@/ImageMeta";
-
-async function getStaticAlbumData(): Promise<ImageMeta[]> {
-  const data = await fetch('STATIC_ALBUM.json')
-  return data.json()
-}
+import { useGallery } from "@/useGallery";
 
 function App() {
   const { colorMode, toggleColorMode } = useColorMode()
-  const [metaDatas, setMetaDatas] = useState<ImageMeta[]>([])
-  const allAlbums = useMemo<string[]>(() => [...new Set(metaDatas.map(x=>x.albumName))], [metaDatas])
-
-  const [currentAlbum, setCurrentAlbum] = useState('')
-  const images = useMemo<ImageMeta[]>(() => 
-    metaDatas
-      .filter(x => x.albumName === currentAlbum)
-      .sort((a, b) => a.imageName === b.imageName ? 0 : a.imageName < b.imageName ? -1: 1), 
-    [currentAlbum, metaDatas])
-  useEffect(() => {
-    (async () => {
-      const datas = await getStaticAlbumData()
-      setMetaDatas(datas)
-      setCurrentAlbum(datas[0].albumName)
-    })()
-  }, [])
+  const {images, currentAlbum, setCurrentAlbum, allAlbums} = useGallery({
+    type: 'STATIC_GALLERY',
+    metaDataUrl: 'STATIC_ALBUM.json'
+  })
   return (
     <VStack mt={4}>
       <HStack w={['100vw', 'md', 'lg']} pl={[2, 0]} pr={[2, 0]} justifyContent='center'>
