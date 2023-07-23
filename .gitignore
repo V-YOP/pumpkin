@@ -3,3 +3,5 @@ STATIC_ALBUM.json
 dist/
 .DS_Store
 album/
+upload_albums/
+CONFIG.ts

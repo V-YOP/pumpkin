@@ -1,15 +1,9 @@
-import { ImageData, ImageMeta } from '../src/ImageMeta'
+import { ImageData, ImageMeta } from './ImageMeta'
 import Sharp from 'Sharp'
 import fs from 'fs/promises'
 import COS from "cos-nodejs-sdk-v5"
 import path from 'path'
-
-const CONFIG = {
-  accessKey: 'AKIDtfL0VosrAIBpWzFIAoDOPGwTq5KQd2MU',
-  secretKey: 'ypX4NVbVDi8OcjlaFgYHoDe2NabdYJp7',
-  bucketName: '71780a8cqed-1259498433',
-  region: 'ap-nanjing'
-}
+import {CONFIG} from './CONFIG.ts'
 
 const cos = new COS({
   SecretId: CONFIG.accessKey, 
@@ -17,28 +11,53 @@ const cos = new COS({
   ChunkParallelLimit: 32, 
   FileParallelLimit: 32})
 
+const META_FILE_PATH = path.resolve(process.cwd(), 'public', 'STATIC_ALBUM.json')
+
+async function readMetaFile() {
+  try {
+    const metaFile = await fs.readFile(META_FILE_PATH)
+    return JSON.parse(metaFile.toString()) as ImageMeta[]
+  } catch (e) {
+    console.error(e)
+    return []
+  }
+}
+
 async function main() {
+  // 读取原来的文件，上传前检查是否已经上传
+  const metaFile = await readMetaFile()
+  const imageIds = new Set<string>()
+  metaFile.forEach(meta => {
+    imageIds.add(meta.albumName + meta.imageName)
+  })
+
   const albums = await getAllAlbumImgs()
   const albumNameImgPairs = Object.entries(albums).flatMap(([albumName, files]) => files.map(file => [albumName, file] as [string, string]))
   const metas: ImageMeta[] = []
   console.time('上传')
   await Promise.all(albumNameImgPairs.map(async ([albumName, imagePath]) => {
     try {
-      const res = await uploadImage(albumName, imagePath)
+      const img = await readImage(imagePath)
+      if (imageIds.has(albumName + img.imageName)) {
+        console.log(`${imagePath} exists, skip`)
+        return
+      }
+      const res = await uploadImage(albumName, img)
       metas.push(res)
     } catch (e) {
       console.error(`${imagePath} read fail`, e)
     }
   }))
-  await fs.writeFile(path.resolve(process.cwd(), 'public', 'STATIC_ALBUM.json'), JSON.stringify(metas))
+  console.timeEnd('上传')
+  await fs.writeFile(META_FILE_PATH, JSON.stringify([...metaFile, ...metas]))
 }
 
-async function uploadImage(albumName: string, imagePath: string): Promise<ImageMeta> {
-  console.time(imagePath)
-  const {imageName, width, height, original, thumbnail} = await readImage(imagePath)
-  console.timeLog(imagePath, '图像处理')
+async function uploadImage(albumName: string, image: ReadImageResult): Promise<ImageMeta> {
+  const {imageName, width, height, original, thumbnail} = image
+  console.time(imageName)
+  console.timeLog(imageName, '图像处理')
   const imageKey = `${albumName}/${imageName}`
-  const thumbKey = imageKey.replace(path.extname(imagePath), `.thumb${path.extname(imagePath)}`)
+  const thumbKey = imageKey.replace(path.extname(imageName), `.thumb${path.extname(imageName)}`)
   const [oriRes, thumbRes] = await Promise.all([cos.putObject({
     Bucket: CONFIG.bucketName,
     Region: CONFIG.region,
@@ -50,14 +69,16 @@ async function uploadImage(albumName: string, imagePath: string): Promise<ImageM
     Body: thumbnail,
     Key: thumbKey
   })])
-  console.timeLog(imagePath, '图像上传')
-  console.timeEnd(imagePath)
+  console.timeLog(imageName, '图像上传')
+  console.timeEnd(imageName)
   return {
     albumName, imageName, width, height, original: oriRes.Location, thumbnail: thumbRes.Location
   }
 }
 
-async function readImage(imgPath: string): Promise<Omit<ImageData, 'original' | 'thumbnail'> & {original: Buffer, thumbnail: Buffer}> {
+type ReadImageResult = Omit<ImageData, 'original' | 'thumbnail'> & {original: Buffer, thumbnail: Buffer}
+
+async function readImage(imgPath: string): Promise<ReadImageResult> {
   const imageName = path.basename(imgPath)
   const bf = await fs.readFile(imgPath)
   const image = Sharp(bf)
@@ -71,7 +92,7 @@ async function readImage(imgPath: string): Promise<Omit<ImageData, 'original' | 
 
 async function getAllAlbumImgs() {
   const albumName2imgs: Record<string, string[]> = {}
-  const ALBUM_PATH = path.resolve(process.cwd(), 'album')
+  const ALBUM_PATH = path.resolve(process.cwd(), 'upload_albums')
   const albums = await fs.readdir(ALBUM_PATH)
   await Promise.all(albums.map(async album => {
     const SUB_ALBUM_PATH = path.resolve(ALBUM_PATH, album)
@@ -90,4 +111,4 @@ async function getAllAlbumImgs() {
   return albumName2imgs
 }
 
-main();
+main().catch(console.error);
