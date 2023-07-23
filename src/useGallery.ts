@@ -24,12 +24,12 @@ export function useGallery(option: GalleryOption) {
 
   const images = useMemo<ImageMeta[]>(() => {
     return album2Metas[currentAlbum] ?? []
-  }, [allAlbums, allImageMeta])
+  }, [album2Metas, currentAlbum])
 
   useEffect(() => {
     (async () => {
-
       // clean
+      console.log('fetching...')
       setError(null)
       setAllImageMeta([])
 
