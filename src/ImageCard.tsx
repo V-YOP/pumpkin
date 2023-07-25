@@ -16,7 +16,6 @@ export const ImageCard: FC<ImageCardProp> = ({
   <CardBody p={0}>
     <Image borderTopLeftRadius='md' borderTopRightRadius='md' src={src} />
   </CardBody>
-  <Divider />
   <CardFooter pt={2} pb={2} pl={[1, 2]} pr={[1, 2]} overflow='hidden' textOverflow='ellipsis'>
     <Text overflowWrap='anywhere'>{imageName}</Text>
   </CardFooter>
