@@ -1,5 +1,5 @@
 import { ImageCard } from "@/ImageCard"
-import { Button, Container, Menu, MenuButton, MenuItem, MenuList, VStack, Text, Box, Image, SimpleGrid, HStack, IconButton, useColorMode } from "@chakra-ui/react"
+import { Button, Container, Menu, MenuButton, MenuItem, MenuList, VStack, Text, Box, Image, SimpleGrid, HStack, IconButton, useColorMode, useMediaQuery, useBreakpoint, useBreakpointValue } from "@chakra-ui/react"
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import { Masonry } from "masonic";
 import { useEffect, useMemo, useReducer, useRef, useState } from "react";
@@ -38,7 +38,7 @@ function App() {
       <Container pl={[1, 4]} pr={[1, 4]} maxW={['100%', '95vw', '90vw', '85vw']}>
 
       <Gallery withDownloadButton options={{tapAction: 'close'}}>
-        <Masonry itemKey={img=>img.original} key={currentAlbum} columnWidth={150} maxColumnCount={7}  columnGutter={15} rowGutter={10} items={[...images]} render={({index, data: {imageName, original, thumbnail, width, height}}) => {
+        <Masonry itemKey={img=>img.original} key={currentAlbum} columnWidth={useBreakpointValue([150, 200, 220])} maxColumnCount={useBreakpointValue([7, 10])}  columnGutter={10} rowGutter={10} items={[...images]} render={({index, data: {imageName, original, thumbnail, width, height}}) => {
           console.log(index)
           return (
             <Item key={index} original={`//${original}`} thumbnail={"//" + thumbnail} width={width} height={height}>
