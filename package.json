@@ -23,6 +23,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-photoswipe-gallery": "^2.2.7",
+    "react-medium-image-zoom": "^5.1.6",
+    "zod": "^3.21.4",
     "sharp": "^0.32.4"
   },
   "devDependencies": {

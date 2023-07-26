@@ -2,7 +2,7 @@ import { ImageCard } from "@/ImageCard"
 import { Button, Container, Menu, MenuButton, MenuItem, MenuList, VStack, Text, Box, Image, SimpleGrid, HStack, IconButton, useColorMode } from "@chakra-ui/react"
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import { Masonry } from "masonic";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { ImageMeta } from "@/ImageMeta";
 import { useGallery } from "@/useGallery";
 
@@ -12,6 +12,7 @@ function App() {
     type: 'STATIC_GALLERY',
     metaDataUrl: 'STATIC_ALBUM.json'
   })
+  
   return (
     <VStack mt={4}>
       <HStack w={['100vw', 'md', 'lg']} pl={[2, 0]} pr={[2, 0]} justifyContent='center'>
@@ -35,16 +36,19 @@ function App() {
       </HStack>
       
       <Container pl={[1, 4]} pr={[1, 4]} maxW={['100%', '95vw', '90vw', '85vw']}>
-      <Gallery>
-        <Masonry key={currentAlbum} columnWidth={150} maxColumnCount={7}  columnGutter={15} rowGutter={10} items={[...images]} render={({index, data: {imageName, original, thumbnail, width, height}}) => (
-          <Item key={imageName} original={"//" + original} thumbnail={"//" + thumbnail} width={width} height={height}>
+
+      <Gallery withDownloadButton options={{tapAction: 'close'}}>
+        <Masonry itemKey={img=>img.original} key={currentAlbum} columnWidth={150} maxColumnCount={7}  columnGutter={15} rowGutter={10} items={[...images]} render={({index, data: {imageName, original, thumbnail, width, height}}) => {
+          console.log(index)
+          return (
+            <Item key={index} original={`//${original}`} thumbnail={"//" + thumbnail} width={width} height={height}>
             {({ ref, open }) => (
               <Box ref={ref as any} onClick={open}>
                 <ImageCard src={"//" + thumbnail} imageName={imageName} />
               </Box>
             )}
           </Item>
-        )}></Masonry>
+        )}}></Masonry>
         {/* <SimpleGrid columns={[2, 2, 3, 4, 5, 6]} spacingX={[0, 2, 3, 4]} spacingY={4} justifyContent='center' justifyItems='center'>
         {Object.entries(images).map(([f, {width, height}]) => {
             return <Item key={f} original={f} width={width} height={height}>
@@ -56,7 +60,7 @@ function App() {
             </Item>
           })}
         </SimpleGrid> */}
-      </Gallery>
+          </Gallery>
       </Container>
     </VStack>
   )
