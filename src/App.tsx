@@ -1,5 +1,5 @@
 import { ImageCard } from "@/ImageCard"
-import { Button, Container, Menu, MenuButton, MenuItem, MenuList, VStack, Text, Box, Image, SimpleGrid, HStack, IconButton, useColorMode, useMediaQuery, useBreakpoint, useBreakpointValue } from "@chakra-ui/react"
+import { Button, Container, Menu, MenuButton, MenuItem, MenuList, VStack, Text, Box, Image, SimpleGrid, HStack, IconButton, useColorMode, useMediaQuery, useBreakpoint, useBreakpointValue, Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel } from "@chakra-ui/react"
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import { Masonry } from "masonic";
 import { useEffect, useMemo, useReducer, useRef, useState } from "react";
@@ -22,7 +22,9 @@ function App() {
               {currentAlbum}
             </Box>
           </MenuButton>
-          <MenuList w={['100vw', 'md', 'lg']}>
+          {
+            allAlbums.length > 1 &&
+            <MenuList w={['100vw', 'md', 'lg']}>
             {allAlbums.map(albumName => (
             <MenuItem 
               justifyContent='center' 
@@ -31,36 +33,41 @@ function App() {
               onClick={() => setCurrentAlbum(albumName)}>{`${albumName === currentAlbum ? '> ': ''}${albumName}`}
             </MenuItem>))}
           </MenuList>
+          }
         </Menu>
         <IconButton aria-label="" onClick={toggleColorMode} />
       </HStack>
       
       <Container pl={[1, 4]} pr={[1, 4]} maxW={['100%', '95vw', '90vw', '85vw']}>
 
-      <Gallery withDownloadButton options={{tapAction: 'close'}}>
         <Masonry itemKey={img=>img.original} key={currentAlbum} columnWidth={useBreakpointValue([150, 200, 220])} maxColumnCount={useBreakpointValue([7, 10])}  columnGutter={10} rowGutter={10} items={[...images]} render={({index, data: {imageName, original, thumbnail, width, height}}) => {
           console.log(index)
           return (
-            <Item key={index} original={`//${original}`} thumbnail={"//" + thumbnail} width={width} height={height}>
-            {({ ref, open }) => (
-              <Box ref={ref as any} onClick={open}>
-                <ImageCard src={"//" + thumbnail} imageName={imageName} />
-              </Box>
-            )}
-          </Item>
+            // 瀑布流布局难以获得图片的顺序，这里直接摆烂
+            // 待grid布局再。
+            <Gallery withDownloadButton options={{tapAction: 'close'}}>
+              <Item key={index} original={`//${original}`} thumbnail={"//" + thumbnail} width={width} height={height}>
+                {({ ref, open }) => (
+                  <Box ref={ref as any} onClick={open}>
+                    <ImageCard src={"//" + thumbnail} imageName={imageName} />
+                  </Box>
+                )}
+              </Item>
+            </Gallery>
         )}}></Masonry>
-        {/* <SimpleGrid columns={[2, 2, 3, 4, 5, 6]} spacingX={[0, 2, 3, 4]} spacingY={4} justifyContent='center' justifyItems='center'>
-        {Object.entries(images).map(([f, {width, height}]) => {
-            return <Item key={f} original={f} width={width} height={height}>
+        {/* <Gallery withDownloadButton options={{tapAction: 'close'}}>
+        <SimpleGrid columns={[2, 2, 3, 4, 5, 6]} spacingX={[1, 2, 3, 4]} spacingY={4} justifyContent='center' justifyItems='center'>
+        {images.map(({width, height, original, thumbnail, imageName}) => {
+            return <Item key={original} original={"//" + original} width={width} height={height}>
               {({ ref, open }) => (
                 <Box ref={ref as any} onClick={open}>
-                  <ImageCard src={f} imageName={f} />
+                  <ImageCard src={"//" + thumbnail} imageName={imageName} />
                 </Box>
               )}
             </Item>
           })}
-        </SimpleGrid> */}
-          </Gallery>
+        </SimpleGrid>
+        </Gallery> */}
       </Container>
     </VStack>
   )
